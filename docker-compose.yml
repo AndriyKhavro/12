@@ -1,0 +1,54 @@
+version: '3.8'
+
+networks:
+  app-tier:
+    name: app-tier
+    driver: bridge
+
+services:
+  redis:
+    image: 'bitnami/redis:7.0.12'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=str0ng_passw0rd
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory ${maxmemory} --maxmemory-policy ${maxmemory_policy}
+    networks:
+      - app-tier
+    ports:
+      - '6379'
+  redis-slave:
+    image: 'bitnami/redis:7.0.12'
+    environment:
+      - REDIS_REPLICATION_MODE=slave
+      - REDIS_MASTER_HOST=redis
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_PASSWORD=str0ng_passw0rd
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory ${maxmemory} --maxmemory-policy ${maxmemory_policy}
+    ports:
+      - '6379'
+    depends_on:
+      - redis
+    networks:
+      - app-tier
+  redis-sentinel:
+    image: 'bitnami/redis-sentinel:7.0.12'
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+    depends_on:
+      - redis
+      - redis-slave
+    ports:
+      - '26379:26379'
+    networks:
+      - app-tier
+
+  app:
+    build:
+      context: .
+      dockerfile: WebApi.Dockerfile
+    depends_on:
+      - redis-sentinel
+    ports:
+      - '8012:80'
+    networks:
+      - app-tier

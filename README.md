@@ -13,7 +13,8 @@
 .\run-simple-cache.ps1
 ```
 
-Results (probabilistic cache):
+### Results (probabilistic cache)
+```
 Transactions:                  40262 hits
 Availability:                 100.00 %
 Elapsed time:                  64.80 secs
@@ -26,8 +27,10 @@ Successful transactions:       40262
 Failed transactions:               0
 Longest transaction:            1.13
 Shortest transaction:           0.00
+```
 
-Results (simple cache):
+### Results (simple cache)
+```
 Transactions:                  44961 hits
 Availability:                 100.00 %
 Elapsed time:                  64.64 secs
@@ -40,6 +43,6 @@ Successful transactions:       44961
 Failed transactions:               0
 Longest transaction:            5.32
 Shortest transaction:           0.00
-
+```
 
 Even though probabilistic cache ensures only one external call is made per expiry time, it's slower than simple cache due to multiple calls (TTL, isComputing).
